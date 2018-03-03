@@ -15,6 +15,21 @@ Download All Media over WiFi
 The goal is to have a simple script that I can run on a cron that will download all the images from a gopro semi-regularly (every hour on the hour). I also want to remove the images from the gopro so that i don't have to swap SD cards. 
 
 
+### Usage
+
+You need to edit the `move_gopro_images` file and modify the `base_folder` and `image_download_dir` variables. Once those are set, you should be able to run the python script to get things going.
+
+    harper@ {~/src/gopro-downloader}$ python move_gopro_images.py
+    Download directory: ./gopro
+    Already exists: ./gopro
+    Found the URL: /videos/DCIM/100GOPRO/GOPR0057.JPG
+    Downloading to: ./gopro/GOPR0057.JPG
+    Downloaded ./gopro/GOPR0057.JPG
+    Deleting: /100GOPRO/GOPR0057.JPG
+    Successfully deleted /100GOPRO/GOPR0057.JPG
+    harper@ {~/src/gopro-downloader}$ 
+
+
 ### My setup
 
 I will have a gopro and a blinkx mounted in a weather proof container on a location with wifi. Using this script, A raspberry pi will grab the images from the gopro and stich them into a timelapse video. 

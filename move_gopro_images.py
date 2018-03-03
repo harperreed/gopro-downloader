@@ -21,7 +21,7 @@ def download_file(url, local_filename):
 
 def delete_image(delete_filename):
     delete_url = "http://10.5.5.9/gp/gpControl/command/storage/delete?p="+delete_filename
-    print(delete_url)
+    #print(delete_url)
     print('Deleting:',delete_filename)
     r = requests.get(delete_url)
     if (r.status_code==200):
