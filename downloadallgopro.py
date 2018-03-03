@@ -4,9 +4,10 @@ import urllib2
 from bs4 import BeautifulSoup
 import urlparse
 import shutil
+
 import re, os
  
-base_url = "http://10.5.5.9:8080/videos/DCIM/XXXGOPRO/" #Where XXX, change it by the directory you want (for instance 100GOPRO)
+base_url = "http://10.5.5.9:8080/videos/DCIM/100GOPRO/" #Where XXX, change it by the directory you want (for instance 100GOPRO)
 content = urllib2.urlopen(base_url).read()
 soup = BeautifulSoup(content)
  
@@ -26,6 +27,11 @@ for a in soup.findAll('a', attrs={'href': media_re}):
     file_name = os.path.join(home_image_dir, a['href'].split('/')[-1])
     if(os.path.isfile(file_name)):
         print('Already exists:',file_name)
+        #delete file 
+        delete_filename = a['href'].replace("/videos/DCIM", "")
+        delete_url = "http://10.5.5.9/gp/gpControl/command/storage/delete?p="+delete_filename
+        print('Deleting:',delete_filename)
+        content = urllib2.urlopen(delete_url).read()
     else:
         print("Downloading to:", file_name)
         with open(file_name, 'wb') as fp:
