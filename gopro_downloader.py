@@ -23,13 +23,11 @@ logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 
 def gopro_wifi_on():
-    ping_cmd = "ping -c 1 -t 1 -w2 " + gopro_host + " > /dev/null 2>&1"
-    logging.debug(ping_cmd)
-    response = os.system(ping_cmd)
-
-    if response == 0:
+    url = "http://" + gopro_host +"/gp/gpMediaList"
+    try:
+        r = requests.get(url, timeout=0.1)
         return True
-    else:
+    except:
         logger.info(gopro_host + ' is not up')
         return False
 
