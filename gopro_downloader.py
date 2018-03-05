@@ -78,7 +78,7 @@ if gopro_wifi_on():
      
     media_re = re.compile(r'(jpg|jpeg|mp4)$', re.IGNORECASE)
 
-    logger.info("Download directory:",image_download_dir)
+    logger.info("Download directory: " + image_download_dir)
      
     try:
         os.makedirs(image_download_dir)
