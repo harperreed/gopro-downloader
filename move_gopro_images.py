@@ -8,6 +8,19 @@ import shutil
 
 import re, os
 
+
+def gopro_wifi_on():
+    ping_cmd = "ping -c 1 -t 1 -w2 " + gopro_host + " > /dev/null 2>&1"
+    print(ping_cmd)
+    response = os.system(ping_cmd)
+
+    if response == 0:
+        return True
+    else:
+        print(gopro_host, 'is not up')
+        return False
+
+
 def download_file(url, local_filename):
     #local_filename = url.split('/')[-1]
     # NOTE the stream=True parameter
@@ -20,7 +33,7 @@ def download_file(url, local_filename):
     return local_filename
 
 def delete_image(delete_filename):
-    delete_url = "http://10.5.5.9/gp/gpControl/command/storage/delete?p="+delete_filename
+    delete_url = "http://" + gopro_host + "/gp/gpControl/command/storage/delete?p="+delete_filename
     #print(delete_url)
     print('Deleting:',delete_filename)
     r = requests.get(delete_url)
@@ -33,40 +46,42 @@ def delete_image(delete_filename):
 
 base_folder = "100GOPRO" #Where XXX, change it by the directory you want (for instance 100GOPRO)
 image_download_dir = "./gopro" #os.path.join(os.path.expanduser("~"),'Pictures', 'gopro')
-
+gopro_host = "10.5.5.9"
  
 # these should be fine
 
-base_url = "http://10.5.5.9:8080/videos/DCIM/" + base_folder + "/"
-content = requests.get(base_url).text
-soup = BeautifulSoup(content, "lxml")
- 
-media_re = re.compile(r'(jpg|jpeg|mp4)$', re.IGNORECASE)
+if gopro_wifi_on():
 
-print("Download directory:",image_download_dir)
- 
-try:
-    os.makedirs(image_download_dir)
-    print("Created:",image_download_dir)
-except (OSError):
-    print('Already exists:',image_download_dir)
- 
-#Run through all the links in the file listing
-for a in soup.findAll('a', attrs={'href': media_re}):
-    print("Found the URL:", a['href'])
-    file_url = urlparse.urljoin(base_url, a['href'])
-    file_name = os.path.join(image_download_dir, a['href'].split('/')[-1])
+    base_url = "http://" + gopro_host + "/videos/DCIM/" + base_folder + "/"
+    content = requests.get(base_url).text
+    soup = BeautifulSoup(content, "lxml")
+     
+    media_re = re.compile(r'(jpg|jpeg|mp4)$', re.IGNORECASE)
 
-    if(os.path.isfile(file_name)):
-        print('Already exists:',file_name)
-        delete_filename = a['href'].replace("/videos/DCIM", "")
-        delete_image(delete_filename)
-        #delete file 
-        
-    else:
-        print("Downloading to:", file_name)
-        download_file(file_url, file_name)
+    print("Download directory:",image_download_dir)
+     
+    try:
+        os.makedirs(image_download_dir)
+        print("Created:",image_download_dir)
+    except (OSError):
+        print('Already exists:',image_download_dir)
+     
+    #Run through all the links in the file listing
+    for a in soup.findAll('a', attrs={'href': media_re}):
+        print("Found the URL:", a['href'])
+        file_url = urlparse.urljoin(base_url, a['href'])
+        file_name = os.path.join(image_download_dir, a['href'].split('/')[-1])
+
         if(os.path.isfile(file_name)):
-            print("Downloaded", file_name)
+            print('Already exists:',file_name)
             delete_filename = a['href'].replace("/videos/DCIM", "")
             delete_image(delete_filename)
+            #delete file 
+            
+        else:
+            print("Downloading to:", file_name)
+            download_file(file_url, file_name)
+            if(os.path.isfile(file_name)):
+                print("Downloaded", file_name)
+                delete_filename = a['href'].replace("/videos/DCIM", "")
+                delete_image(delete_filename)
