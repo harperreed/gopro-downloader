@@ -9,16 +9,28 @@ import yaml
 
 import re, os
 
+# handle logging
+
+import logging
+# create logger with 'spam_application'
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logging.getLogger("requests").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+
+#let's do it
+
 
 def gopro_wifi_on():
     ping_cmd = "ping -c 1 -t 1 -w2 " + gopro_host + " > /dev/null 2>&1"
-    print(ping_cmd)
+    logging.debug(ping_cmd)
     response = os.system(ping_cmd)
 
     if response == 0:
         return True
     else:
-        print(gopro_host, 'is not up')
+        logger.info(gopro_host + ' is not up')
         return False
 
 
@@ -36,12 +48,12 @@ def download_file(url, local_filename):
 def delete_image(delete_filename):
     delete_url = "http://" + gopro_host + "/gp/gpControl/command/storage/delete?p="+delete_filename
     #print(delete_url)
-    print('Deleting:',delete_filename)
+    logger.info('Deleting: ' + delete_filename)
     r = requests.get(delete_url)
     if (r.status_code==200):
-        print("Successfully deleted", delete_filename)
+        logger.debug("Successfully deleted: " + delete_filename)
     else:
-        print("Error occurred deleting", delete_filename)
+        logger.error("Error occurred deleting: " + delete_filename)
 
 # config these dudes
 
@@ -64,22 +76,22 @@ if gopro_wifi_on():
      
     media_re = re.compile(r'(jpg|jpeg|mp4)$', re.IGNORECASE)
 
-    print("Download directory:",image_download_dir)
+    logger.info("Download directory:",image_download_dir)
      
     try:
         os.makedirs(image_download_dir)
-        print("Created:",image_download_dir)
+        logger.debug("Created: " + image_download_dir)
     except (OSError):
-        print('Already exists:',image_download_dir)
+        logger.debug('Already exists: ' + image_download_dir)
      
     #Run through all the links in the file listing
     for a in soup.findAll('a', attrs={'href': media_re}):
-        print("Found the URL:", a['href'])
+        logger.debug("Found the URL: " +  a['href'])
         file_url = urlparse.urljoin(base_url, a['href'])
         file_name = os.path.join(image_download_dir, a['href'].split('/')[-1])
 
         if(os.path.isfile(file_name)):
-            print('Already exists:',file_name)
+            logger.debug('Already exists: ' + file_name)
             delete_filename = a['href'].replace("/videos/DCIM", "")
             delete_image(delete_filename)
             #delete file 
@@ -88,6 +100,6 @@ if gopro_wifi_on():
             print("Downloading to:", file_name)
             download_file(file_url, file_name)
             if(os.path.isfile(file_name)):
-                print("Downloaded", file_name)
+                logger.info("Downloaded" + file_name)
                 delete_filename = a['href'].replace("/videos/DCIM", "")
                 delete_image(delete_filename)
