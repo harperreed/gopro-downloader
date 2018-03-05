@@ -100,10 +100,10 @@ if gopro_wifi_on():
                 #delete file 
             
         else:
-            print("Downloading to:", file_name)
+            logger.info("Downloading to: " + file_name)
             download_file(file_url, file_name)
             if(os.path.isfile(file_name)):
-                logger.info("Downloaded" + file_name)
+                logger.info("Successfully downloaded: " + file_name)
                 if delete_images:
                     delete_filename = a['href'].replace("/videos/DCIM", "")
                     delete_image(delete_filename)
