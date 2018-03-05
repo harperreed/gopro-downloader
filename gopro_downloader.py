@@ -33,7 +33,6 @@ def gopro_wifi_on():
         logger.info(gopro_host + ' is not up')
         return False
 
-
 def download_file(url, local_filename):
     #local_filename = url.split('/')[-1]
     # NOTE the stream=True parameter
@@ -62,9 +61,12 @@ config_file = os.path.dirname(os.path.realpath(__file__)) + "/config.yaml"
 with open(config_file, 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
+print(cfg['gopro']['delete_images'])
+
 base_folder = cfg['gopro']['sd_dir']
 image_download_dir = cfg['images']['save_dir'] #os.path.join(os.path.expanduser("~"),'Pictures', 'gopro')
 gopro_host = cfg['gopro']['host']
+delete_images = cfg['gopro']['delete_images']
  
 # these should be fine
 
@@ -92,14 +94,16 @@ if gopro_wifi_on():
 
         if(os.path.isfile(file_name)):
             logger.debug('Already exists: ' + file_name)
-            delete_filename = a['href'].replace("/videos/DCIM", "")
-            delete_image(delete_filename)
-            #delete file 
+            if delete_images:
+                delete_filename = a['href'].replace("/videos/DCIM", "")
+                delete_image(delete_filename)
+                #delete file 
             
         else:
             print("Downloading to:", file_name)
             download_file(file_url, file_name)
             if(os.path.isfile(file_name)):
                 logger.info("Downloaded" + file_name)
-                delete_filename = a['href'].replace("/videos/DCIM", "")
-                delete_image(delete_filename)
+                if delete_images:
+                    delete_filename = a['href'].replace("/videos/DCIM", "")
+                    delete_image(delete_filename)

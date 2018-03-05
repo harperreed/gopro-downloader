@@ -1,5 +1,6 @@
 gopro:
   host: 10.5.5.9
   sd_dir: 100GOPRO
+  delete_images: true
 images:
   save_dir: ./gopro
