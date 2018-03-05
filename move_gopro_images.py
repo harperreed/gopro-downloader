@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 import urlparse
 import shutil
+import yaml
 
 import re, os
 
@@ -44,9 +45,14 @@ def delete_image(delete_filename):
 
 # config these dudes
 
-base_folder = "100GOPRO" #Where XXX, change it by the directory you want (for instance 100GOPRO)
-image_download_dir = "./gopro" #os.path.join(os.path.expanduser("~"),'Pictures', 'gopro')
-gopro_host = "10.5.5.9"
+
+config_file = os.path.dirname(os.path.realpath(__file__)) + "/config.yaml" 
+with open(config_file, 'r') as ymlfile:
+    cfg = yaml.load(ymlfile)
+
+base_folder = cfg['gopro']['sd_dir']
+image_download_dir = cfg['images']['save_dir'] #os.path.join(os.path.expanduser("~"),'Pictures', 'gopro')
+gopro_host = cfg['gopro']['host']
  
 # these should be fine
 
