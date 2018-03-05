@@ -7,7 +7,7 @@ import urlparse
 import shutil
 import yaml
 
-import re, os
+import sys, re, os
 
 # handle logging
 
@@ -57,11 +57,13 @@ def delete_image(delete_filename):
 # config these dudes
 
 
-config_file = os.path.dirname(os.path.realpath(__file__)) + "/config.yaml" 
-with open(config_file, 'r') as ymlfile:
-    cfg = yaml.load(ymlfile)
-
-print(cfg['gopro']['delete_images'])
+try:
+    config_file = os.path.dirname(os.path.realpath(__file__)) + "/config.yaml" 
+    with open(config_file, 'r') as ymlfile:
+        cfg = yaml.load(ymlfile)
+except:
+    logger.error("config file not found: "+ config_file)
+    sys.exit(0)
 
 base_folder = cfg['gopro']['sd_dir']
 image_download_dir = cfg['images']['save_dir'] #os.path.join(os.path.expanduser("~"),'Pictures', 'gopro')
